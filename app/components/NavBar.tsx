@@ -12,7 +12,7 @@ export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="w-full px-1 md:px-6 py-1 md:py-4 bg-white fixed top-0 z-50 font-[var(--font-roboto-mono)]">
+    <nav className="w-full px-3 md:px-10 py-4 md:py-8 bg-white/95 backdrop-blur-sm fixed top-0 z-50 font-[var(--font-roboto-mono)]">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Left side - Social Icons */}
         <div className="flex gap-1.5 md:gap-6 items-center">
