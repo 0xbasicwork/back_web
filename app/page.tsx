@@ -6,23 +6,23 @@ export default function Home() {
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <NavBar />
-      <main className="flex-1 flex flex-col items-center justify-center gap-8 pt-24">
+      <main className="flex-1 flex flex-col items-center justify-center gap-8 pt-20 md:pt-24 px-4">
         <Image
           src="/we-are-back.png"
           alt="We are so $BACK"
           width={1800}
           height={900}
           priority
-          className="w-[900px] max-w-[98vw] h-auto"
+          className="w-[900px] max-w-[95vw] h-auto"
         />
         <div className="text-center text-black tracking-wider" style={{ fontFamily: 'var(--font-roboto-mono)' }}>
-          <h1 className="text-[72px] leading-tight font-bold mb-8">
+          <h1 className="text-[36px] md:text-[72px] leading-tight font-bold mb-4 md:mb-8">
             IT&apos;S SEND EVERYTHING SEASON.
           </h1>
-          <h2 className="text-[72px] leading-tight font-bold mb-16">
+          <h2 className="text-[36px] md:text-[72px] leading-tight font-bold mb-8 md:mb-16">
             BUY $BACK.
           </h2>
-          <div className="text-[48px] leading-tight font-normal space-y-4">
+          <div className="text-[24px] md:text-[48px] leading-tight font-normal space-y-2 md:space-y-4">
             <p>NO KOLS.</p>
             <p>NO CABALS.</p>
             <p>NO BUNDLES.</p>
