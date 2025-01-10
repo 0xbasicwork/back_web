@@ -12,6 +12,7 @@ export default function Home() {
         muted 
         playsInline
         className="fixed top-0 left-0 min-w-full min-h-full object-cover z-0 opacity-70"
+        poster="/we-are-back.png"
       >
         <source src="/background.mp4" type="video/mp4" />
       </video>
@@ -19,7 +20,7 @@ export default function Home() {
       {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         <NavBar />
-        <main className="flex-1 flex flex-col items-center justify-center gap-8 pt-20 md:pt-24 px-4">
+        <main className="flex-1 flex flex-col items-center justify-center gap-8 pt-32 md:pt-36 px-4">
           <Image
             src="/we-are-back.png"
             alt="We are so $BACK"
