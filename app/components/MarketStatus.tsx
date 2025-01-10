@@ -81,9 +81,13 @@ export default function MarketStatus() {
         
         setStatus(marketStatus);
         setError(null);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Error fetching index:', error);
-        setError(error.message);
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError('An unknown error occurred');
+        }
         setStatus("We are so back."); // Default fallback
       }
     };
