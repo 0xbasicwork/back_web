@@ -5,6 +5,8 @@ import "./globals.css";
 const robotoMono = localFont({
   src: './fonts/RobotoMono-Bold.ttf',
   variable: '--font-roboto-mono',
+  display: 'swap',
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -19,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${robotoMono.variable} bg-white`}>
+      <body className={`${robotoMono.variable} font-roboto`}>
         {children}
       </body>
     </html>
