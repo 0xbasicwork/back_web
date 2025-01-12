@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 
@@ -34,7 +34,7 @@ function getLEDColorForIndex(index: number): string {
 }
 
 export default function MarketStatus() {
-  const [status, setStatus] = useState("Loading...");
+  const [status, setStatus] = useState('Loading...');
   const [error, setError] = useState<string | null>(null);
   const [index, setIndex] = useState(48);
 
@@ -62,21 +62,21 @@ export default function MarketStatus() {
         // Interpret the index value
         let marketStatus;
         if (data.index <= 10) {
-          marketStatus = "It's so over.";
+          marketStatus = 'It\'s so over.';
         } else if (data.index <= 25) {
-          marketStatus = "It's over.";
+          marketStatus = 'It\'s over.';
         } else if (data.index <= 35) {
-          marketStatus = "Fuck it, we ball.";
+          marketStatus = 'Fuck it, we ball.';
         } else if (data.index <= 50) {
-          marketStatus = "It is what it is.";
+          marketStatus = 'It is what it is.';
         } else if (data.index <= 65) {
-          marketStatus = "We vibing.";
+          marketStatus = 'We vibing.';
         } else if (data.index <= 75) {
-          marketStatus = "We're back.";
+          marketStatus = 'We\'re back.';
         } else if (data.index <= 90) {
-          marketStatus = "We are so back.";
+          marketStatus = 'We are so back.';
         } else {
-          marketStatus = "LET'S FUCKING GOOO!";
+          marketStatus = 'LET\'S FUCKING GOOO!';
         }
         
         setStatus(marketStatus);
@@ -88,7 +88,7 @@ export default function MarketStatus() {
         } else {
           setError('An unknown error occurred');
         }
-        setStatus("We are so back."); // Default fallback
+        setStatus('We are so back.'); // Default fallback
       }
     };
 

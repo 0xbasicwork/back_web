@@ -10,7 +10,7 @@ export default function BackgroundVideo() {
     setMounted(true);
     if (videoRef.current) {
       videoRef.current.play().catch(error => {
-        console.log("Video autoplay failed:", error);
+        console.log('Video autoplay failed:', error);
       });
     }
   }, []);

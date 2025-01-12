@@ -1,18 +1,9 @@
-/** @type {import('next').NextConfig} */
+﻿/** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  output: 'export',
   images: {
     unoptimized: true,
-  },
-  // Optimize for production
-  poweredByHeader: false,
-  reactStrictMode: true,
-  swcMinify: true,
-  // Ignore favicon errors
-  webpack: (config) => {
-    config.resolve.fallback = { fs: false };
-    return config;
-  },
-}
+  }
+};
 
-module.exports = nextConfig 
+module.exports = nextConfig;

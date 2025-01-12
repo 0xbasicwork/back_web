@@ -1,29 +1,25 @@
-import type { Metadata } from "next";
-import localFont from 'next/font/local';
-import "./globals.css";
+import { Roboto_Mono } from 'next/font/google';
+import './globals.css';
 
-const robotoMono = localFont({
-  src: './fonts/RobotoMono-Bold.ttf',
-  variable: '--font-roboto-mono',
+const robotoMono = Roboto_Mono({
+  subsets: ['latin'],
   display: 'swap',
-  preload: true,
+  variable: '--font-roboto-mono',
 });
 
-export const metadata: Metadata = {
-  title: "We're So Back | $BACK",
-  description: "IT'S SEND EVERYTHING SEASON.",
+export const metadata = {
+  title: 'We\'re So Back | $BACK',
+  description: 'IT\'S SEND EVERYTHING SEASON.',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body className={`${robotoMono.variable} font-roboto`}>
-        {children}
-      </body>
+    <html lang="en" className={`${robotoMono.variable}`}>
+      <body className="font-mono">{children}</body>
     </html>
   );
 }

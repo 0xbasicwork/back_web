@@ -3,13 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --foreground: #000000;
-  --background: #ffffff;
+  --font-roboto-mono: 'Roboto Mono', monospace;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  font-family: var(--font-roboto-mono);
 }
 
 @keyframes breathing {

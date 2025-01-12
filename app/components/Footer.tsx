@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { FaWolfPackBattalion } from "react-icons/fa";
-import { SiHiveBlockchain } from "react-icons/si";
-import { FaXTwitter, FaTelegram, FaTiktok } from "react-icons/fa6";
+import Link from 'next/link';
+import { FaWolfPackBattalion } from 'react-icons/fa';
+import { SiHiveBlockchain } from 'react-icons/si';
+import { FaXTwitter, FaTelegram, FaTiktok } from 'react-icons/fa6';
 
 export default function Footer() {
   return (
@@ -46,7 +46,7 @@ export default function Footer() {
         </div>
         <div className="text-white text-[10px] md:text-[14px] text-center" style={{ fontFamily: 'var(--font-roboto-mono)' }}>
           <p className="mb-1 md:mb-2">
-            All rights reserved © 2024{" "}
+            All rights reserved © 2024{' '}
             <Link 
               href="https://www.workforyourbags.lol/" 
               target="_blank"

@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
-import Link from "next/link";
-import { FaWolfPackBattalion } from "react-icons/fa";
-import { SiHiveBlockchain } from "react-icons/si";
-import { FaXTwitter, FaTelegram, FaTiktok } from "react-icons/fa6";
-import { RiMenu3Line, RiCloseLine } from "react-icons/ri";
-import MarketStatus from "./MarketStatus";
+import Link from 'next/link';
+import { FaWolfPackBattalion } from 'react-icons/fa';
+import { SiHiveBlockchain } from 'react-icons/si';
+import { FaXTwitter, FaTelegram, FaTiktok } from 'react-icons/fa6';
+import { RiMenu3Line, RiCloseLine } from 'react-icons/ri';
+import MarketStatus from './MarketStatus';
 
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
