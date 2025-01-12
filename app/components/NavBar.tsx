@@ -69,7 +69,7 @@ export default function NavBar() {
             TOKENOMICS
           </Link>
           <Link 
-            href="https://index.sobackitsover.xyz/" 
+            href="https://www.sobackitsover.xyz/dashboard" 
             target="_blank"
             className="text-black hover:underline underline-offset-8"
           >
