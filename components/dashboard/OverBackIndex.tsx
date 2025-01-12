@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://45.76.10.9:3000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://45.76.10.9:3000';
 
 export function OverBackIndex() {
   const [indexData, setIndexData] = useState<{ html: string; css: string } | null>(null);
