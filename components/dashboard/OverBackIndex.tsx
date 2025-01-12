@@ -40,9 +40,9 @@ export function OverBackIndex() {
           const css = await cssRes.text();
           setIndexData({ html, css });
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Fetch error:', err);
-        setError(`Error loading index data: ${err.message}`);
+        setError(`Error loading index data: ${err instanceof Error ? err.message : 'Unknown error'}`);
       }
     }
 
