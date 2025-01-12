@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://45.76.10.9:3000';
+
 export function OverBackIndex() {
   const [indexData, setIndexData] = useState<{ html: string; css: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -9,16 +11,32 @@ export function OverBackIndex() {
   useEffect(() => {
     async function fetchIndexData() {
       try {
-        const res = await fetch('http://45.76.10.9:3000');
+        const res = await fetch(API_URL, {
+          headers: {
+            'Accept': 'text/html',
+            'Cache-Control': 'no-cache'
+          }
+        });
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
         const html = await res.text();
 
         const cssLink = html.match(/<link rel="stylesheet" href="(\/css\/styles\.css)">/)?.[1];
         if (cssLink) {
-          const cssRes = await fetch(`http://45.76.10.9:3000${cssLink}`);
+          const cssRes = await fetch(`${API_URL}${cssLink}`, {
+            headers: {
+              'Accept': 'text/css',
+              'Cache-Control': 'no-cache'
+            }
+          });
           const css = await cssRes.text();
           setIndexData({ html, css });
         }
       } catch (err) {
+        console.error('Fetch error:', err);
         setError('Error loading index data. Please try again later.');
       }
     }
