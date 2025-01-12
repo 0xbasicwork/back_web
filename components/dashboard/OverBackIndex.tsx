@@ -2,44 +2,21 @@
 
 import { useState, useEffect } from 'react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://45.76.10.9:3000';
-
 export function OverBackIndex() {
   const [indexData, setIndexData] = useState<{ html: string; css: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchIndexData() {
-      console.log('Fetching from:', API_URL);
+      console.log('Fetching from proxy');
       try {
-        const res = await fetch(API_URL, {
-          headers: {
-            'Accept': 'text/html',
-            'Cache-Control': 'no-cache'
-          },
-          next: { revalidate: 0 }
-        });
-        
+        const res = await fetch('/api/proxy');
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
         
-        const html = await res.text();
-        console.log('HTML received:', html.slice(0, 100));
-
-        const cssLink = html.match(/<link rel="stylesheet" href="(\/css\/styles\.css)">/)?.[1];
-        if (cssLink) {
-          console.log('CSS Link found:', cssLink);
-          const cssRes = await fetch(`${API_URL}${cssLink}`, {
-            headers: {
-              'Accept': 'text/css',
-              'Cache-Control': 'no-cache'
-            },
-            next: { revalidate: 0 }
-          });
-          const css = await cssRes.text();
-          setIndexData({ html, css });
-        }
+        const data = await res.json();
+        setIndexData(data);
       } catch (err: unknown) {
         console.error('Fetch error:', err);
         setError(`Error loading index data: ${err instanceof Error ? err.message : 'Unknown error'}`);
