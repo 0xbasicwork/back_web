@@ -3,6 +3,17 @@ import { NextResponse } from 'next/server';
 const API_URL = 'http://45.76.10.9:3000/api/console';
 const HISTORY_URL = 'http://45.76.10.9:3000/api/console/history';
 
+interface LogEntry {
+  timestamp: string;
+  type: 'success' | 'info' | 'system' | 'error' | 'log';
+  message: string;
+}
+
+interface ParsedLogEntry extends LogEntry {
+  hasExplicitTimestamp: boolean;
+  isUpdateLine?: boolean;
+}
+
 function parseDate(dateStr: string): Date {
   try {
     // Convert DD/MM/YYYY to MM/DD/YYYY for proper parsing
@@ -14,7 +25,7 @@ function parseDate(dateStr: string): Date {
   }
 }
 
-function parseLogLine(line: string, lastKnownTimestamp: string) {
+function parseLogLine(line: string, lastKnownTimestamp: string): ParsedLogEntry | null {
   // Check for "Last Updated:" line first to get the base timestamp
   if (line.startsWith('Last Updated:')) {
     const updateMatch = line.match(/Last Updated: (\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}:\d{2}) UTC/);
