@@ -1,3 +1,4 @@
+// Always use HTTP since the API doesn't have SSL
 const API_BASE_URL = 'http://45.76.10.9:3000';
 
 export interface IndexData {
@@ -13,22 +14,21 @@ export interface IndexData {
 
 export async function getIndexData(): Promise<IndexData> {
   try {
-    const res = await fetch(API_BASE_URL, {
+    console.log('Fetching from:', API_BASE_URL);
+    // Use proxy endpoint instead of direct API call
+    const res = await fetch('/api/proxy/index', {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        'Accept': '*/*',
+        'Content-Type': 'text/html',
       },
-      cache: 'no-store',
-      next: { revalidate: 60 }
+      cache: 'no-store'
     });
 
-    if (!res.ok) {
-      throw new Error(`Failed to fetch index data: ${res.status}`);
-    }
-
+    console.log('Response status:', res.status);
     const html = await res.text();
-    
+    console.log('Response HTML:', html.substring(0, 200) + '...'); // First 200 chars
+
     // Updated regex patterns to match the actual HTML structure
     const scoreMatch = html.match(/<div class="score">(\d+)<\/div>/);
     const marketMatch = html.match(/Market Data[\s\S]*?value">(\d+)%<\/span>/);

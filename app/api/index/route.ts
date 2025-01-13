@@ -4,17 +4,10 @@ import { getIndexData } from '@/lib/api';
 export async function GET() {
   try {
     const data = await getIndexData();
-    
-    return NextResponse.json({
-      index: data.score,
-      market_data: data.components.market,
-      social_sentiment: data.components.sentiment,
-      onchain_activity: data.components.onChain
-    });
-
+    return NextResponse.json(data);
   } catch (error) {
     console.error('API Error:', error);
-    // Return mock data as fallback if the API fails
+    // Return fallback data instead of error
     return NextResponse.json({
       index: 47,
       market_data: 59,
