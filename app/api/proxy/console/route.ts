@@ -32,7 +32,7 @@ function parseLogLine(line: string, lastKnownTimestamp: string): ParsedLogEntry 
     if (updateMatch) {
       return {
         timestamp: parseDate(updateMatch[1]).toISOString(),
-        type: 'system',
+        type: 'system' as const,
         message: line.trim(),
         hasExplicitTimestamp: true,
         isUpdateLine: true
@@ -52,7 +52,7 @@ function parseLogLine(line: string, lastKnownTimestamp: string): ParsedLogEntry 
       const timestamp = parseDate(timestampMatch[1]).toISOString();
       const message = line.split('UTC:')[1].trim();
 
-      let type = 'info';
+      let type: LogEntry['type'] = 'info';
       if (message.includes('✓')) type = 'success';
       else if (message.includes('•')) type = 'system';
       else if (message.includes('→')) type = 'info';
@@ -71,8 +71,8 @@ function parseLogLine(line: string, lastKnownTimestamp: string): ParsedLogEntry 
   }
 
   // For non-timestamped lines, use the last known timestamp
-  const type = line.includes('🚀') || line.includes('📊') || 
-               line.includes('🐦') || line.includes('⛓️') ? 'system' : 'info';
+  const type: LogEntry['type'] = line.includes('🚀') || line.includes('📊') || 
+                                line.includes('🐦') || line.includes('⛓️') ? 'system' : 'info';
 
   return {
     timestamp: lastKnownTimestamp,
