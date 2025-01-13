@@ -8,7 +8,7 @@ import { FaXTwitter, FaTelegram, FaTiktok } from 'react-icons/fa6';
 import { RiMenu3Line, RiCloseLine } from 'react-icons/ri';
 import MarketStatus from './MarketStatus';
 
-export default function NavBar({ variant = 'default' }) {
+export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
