@@ -6,6 +6,7 @@ import { DrunkenFont } from '../DrunkenFont';
 import { IndexMeter } from './IndexMeter';
 import { getMarketStatus } from '@/app/components/MarketStatus';
 import { IndexHistory } from './IndexHistory';
+import { ConsoleOutput } from './ConsoleOutput';
 
 export function OverBackIndex() {
   const [data, setData] = useState<IndexData | null>(null);
@@ -133,6 +134,9 @@ export function OverBackIndex() {
         <h2 className="text-xl font-bold mb-4 text-center">30 Day History</h2>
         <IndexHistory data={historicalData} />
       </div>
+
+      {/* Console Output */}
+      <ConsoleOutput />
 
       {/* Last Updated */}
       <div className="text-center text-sm text-gray-500 mt-8 font-mono">

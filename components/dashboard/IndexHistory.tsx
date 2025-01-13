@@ -83,6 +83,7 @@ export function IndexHistory({ data }: IndexHistoryProps) {
           displayFormats: {
             day: 'MMM d',
           },
+          tooltipFormat: 'PPP',
         },
         grid: {
           display: false,
@@ -99,6 +100,20 @@ export function IndexHistory({ data }: IndexHistoryProps) {
     plugins: {
       legend: {
         display: false,
+      },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => `Index: ${context.parsed.y}`,
+        },
+      },
+    },
+    elements: {
+      point: {
+        radius: 4,
+        hoverRadius: 6,
+      },
+      line: {
+        tension: 0.3,
       },
     },
   };
