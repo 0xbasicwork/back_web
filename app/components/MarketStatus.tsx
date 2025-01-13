@@ -9,6 +9,25 @@ interface IndexData {
   onchain_activity: number;
 }
 
+interface MarketStatusConfig {
+  threshold: number;
+  message: string;
+}
+
+const STATUS_LEVELS: MarketStatusConfig[] = [
+  { threshold: 90, message: 'LET\'S FUCKING GOOO!' },
+  { threshold: 75, message: 'We are so back.' },
+  { threshold: 60, message: 'We\'re back.' },
+  { threshold: 50, message: 'We vibing.' },
+  { threshold: 30, message: 'It is what it is.' },
+  { threshold: 15, message: 'It\'s over.' },
+  { threshold: 0,  message: 'It\'s so over.' },
+];
+
+export function getMarketStatus(index: number): string {
+  return STATUS_LEVELS.find(level => index > level.threshold)?.message || STATUS_LEVELS[STATUS_LEVELS.length - 1].message;
+}
+
 function getColorForIndex(index: number): string {
   if (index <= 10) return 'text-red-500';
   if (index <= 25) return 'text-red-400';
@@ -60,24 +79,7 @@ export default function MarketStatus() {
         setIndex(data.index);
         
         // Interpret the index value
-        let marketStatus;
-        if (data.index <= 10) {
-          marketStatus = 'It\'s so over.';
-        } else if (data.index <= 25) {
-          marketStatus = 'It\'s over.';
-        } else if (data.index <= 35) {
-          marketStatus = 'Fuck it, we ball.';
-        } else if (data.index <= 50) {
-          marketStatus = 'It is what it is.';
-        } else if (data.index <= 65) {
-          marketStatus = 'We vibing.';
-        } else if (data.index <= 75) {
-          marketStatus = 'We\'re back.';
-        } else if (data.index <= 90) {
-          marketStatus = 'We are so back.';
-        } else {
-          marketStatus = 'LET\'S FUCKING GOOO!';
-        }
+        const marketStatus = getMarketStatus(data.index);
         
         setStatus(marketStatus);
         setError(null);

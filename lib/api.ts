@@ -1,59 +1,81 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://45.76.10.9:3000/api';
+const API_BASE_URL = 'http://45.76.10.9:3000';
 
 export interface IndexData {
-  timestamp: string;
   score: number;
-  label: string;
+  trend: 'up' | 'down' | 'neutral';
   components: {
     market: number;
     sentiment: number;
     onChain: number;
   };
+  lastUpdated: string;
 }
 
-export interface HistoryData {
-  score: number;
-  timestamp: string;
-}
+export async function getIndexData(): Promise<IndexData> {
+  try {
+    const res = await fetch(API_BASE_URL, {
+      next: { revalidate: 60 }
+    });
 
-export interface TrendData {
-  trend: 'increasing' | 'decreasing' | 'stable' | 'insufficient_data';
-}
-
-export async function getLatestIndex(): Promise<IndexData> {
-  // Mock data for now - replace with actual API call
-  return {
-    timestamp: new Date().toISOString(),
-    score: 65,
-    label: 'Neutral',
-    components: {
-      market: 70,
-      sentiment: 60,
-      onChain: 65
+    if (!res.ok) {
+      throw new Error(`Failed to fetch index data: ${res.status}`);
     }
-  };
+
+    const html = await res.text();
+    
+    // Updated regex patterns to match the actual HTML structure
+    const scoreMatch = html.match(/<div class="score">(\d+)<\/div>/);
+    const marketMatch = html.match(/Market Data[\s\S]*?value">(\d+)%<\/span>/);
+    const sentimentMatch = html.match(/Social Sentiment[\s\S]*?value">(\d+)%<\/span>/);
+    const onChainMatch = html.match(/On-chain Activity[\s\S]*?value">(\d+)%<\/span>/);
+
+    const score = parseFloat(scoreMatch?.[1] || '0');
+    const market = parseFloat(marketMatch?.[1] || '0');
+    const sentiment = parseFloat(sentimentMatch?.[1] || '0');
+    const onChain = parseFloat(onChainMatch?.[1] || '0');
+
+    // Get the last updated time
+    const lastUpdatedMatch = html.match(/Last updated: ([^<]+)/);
+    const lastUpdated = lastUpdatedMatch?.[1] || new Date().toISOString();
+
+    return {
+      score,
+      trend: 'neutral',
+      components: {
+        market,
+        sentiment,
+        onChain
+      },
+      lastUpdated
+    };
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
 }
 
-export async function getIndexHistory(days = 30): Promise<HistoryData[]> {
-  const res = await fetch(`${API_BASE_URL}/history?days=${days}`, {
-    next: { revalidate: 3600 } // Revalidate every hour
-  });
-  
-  if (!res.ok) {
-    throw new Error('Failed to fetch history data');
-  }
-  
-  return res.json();
-}
+// Try these potential endpoints
+export async function getAvailableEndpoints() {
+  const endpoints = [
+    '/api/index',          // Main index data
+    '/api/history',        // Historical data
+    '/api/tokens',         // Token list
+    '/api/metrics',        // Detailed metrics
+    '/api/volume',         // Volume data
+    '/api/sentiment',      // Detailed sentiment
+    '/api/onchain'         // Detailed on-chain data
+  ];
 
-export async function getIndexTrend(): Promise<TrendData> {
-  const res = await fetch(`${API_BASE_URL}/trend`, {
-    next: { revalidate: 300 } // Revalidate every 5 minutes
-  });
-  
-  if (!res.ok) {
-    throw new Error('Failed to fetch trend data');
+  for (const endpoint of endpoints) {
+    try {
+      const res = await fetch(`${API_BASE_URL}${endpoint}`);
+      console.log(`${endpoint}: ${res.status}`);
+      if (res.ok) {
+        const data = await res.json();
+        console.log(data);
+      }
+    } catch (error) {
+      console.log(`${endpoint}: Not available`);
+    }
   }
-  
-  return res.json();
 } 

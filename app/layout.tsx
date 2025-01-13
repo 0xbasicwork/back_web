@@ -1,11 +1,11 @@
-import { Roboto_Mono } from 'next/font/google';
-import './globals.css';
+import { drunkenFont } from './fonts'
+import { Roboto_Mono } from 'next/font/google'
+import './globals.css'
 
 const robotoMono = Roboto_Mono({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-roboto-mono',
-});
+})
 
 export const metadata = {
   title: 'We\'re So Back | $BACK',
@@ -15,11 +15,11 @@ export const metadata = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${robotoMono.variable}`}>
-      <body className="font-mono">{children}</body>
+    <html lang="en" className={drunkenFont.variable}>
+      <body className={`min-h-screen ${robotoMono.className}`}>{children}</body>
     </html>
-  );
+  )
 }
