@@ -60,7 +60,8 @@ export default function MarketStatus() {
   useEffect(() => {
     const fetchIndex = async () => {
       try {
-        const response = await fetch('/api/index', {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+        const response = await fetch(`${baseUrl}/api/index`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
