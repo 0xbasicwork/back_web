@@ -15,8 +15,7 @@ export interface IndexData {
 export async function getIndexData(): Promise<IndexData> {
   try {
     console.log('Fetching from:', API_BASE_URL);
-    // Use proxy endpoint instead of direct API call
-    const res = await fetch('/api/proxy/index', {
+    const res = await fetch(new URL('/api/proxy', window.location.origin).toString(), {
       method: 'GET',
       headers: {
         'Accept': '*/*',
@@ -57,27 +56,55 @@ export async function getIndexData(): Promise<IndexData> {
 }
 
 // Try these potential endpoints
-export async function getAvailableEndpoints() {
-  const endpoints = [
-    '/api/index',          // Main index data
-    '/api/history',        // Historical data
-    '/api/tokens',         // Token list
-    '/api/metrics',        // Detailed metrics
-    '/api/volume',         // Volume data
-    '/api/sentiment',      // Detailed sentiment
-    '/api/onchain'         // Detailed on-chain data
-  ];
+// export async function getAvailableEndpoints() {
+//   const endpoints = [
+//     '/api/index',          // Main index data
+//     '/api/history',        // Historical data
+//     '/api/tokens',         // Token list
+//     '/api/metrics',        // Detailed metrics
+//     '/api/volume',         // Volume data
+//     '/api/sentiment',      // Detailed sentiment
+//     '/api/onchain'         // Detailed on-chain data
+//   ];
+//
+//   for (const endpoint of endpoints) {
+//     try {
+//       const res = await fetch(`${API_BASE_URL}${endpoint}`);
+//       console.log(`${endpoint}: ${res.status}`);
+//       if (res.ok) {
+//         const data = await res.json();
+//         console.log(data);
+//       }
+//     } catch (error) {
+//       console.log(`${endpoint}: Not available`);
+//     }
+//   }
+// }
 
-  for (const endpoint of endpoints) {
-    try {
-      const res = await fetch(`${API_BASE_URL}${endpoint}`);
-      console.log(`${endpoint}: ${res.status}`);
-      if (res.ok) {
-        const data = await res.json();
-        console.log(data);
-      }
-    } catch (error) {
-      console.log(`${endpoint}: Not available`);
+export interface HistoricalData {
+  timestamp: string;
+  value: number;
+}
+
+export async function getHistoricalData(): Promise<HistoricalData[]> {
+  try {
+    const res = await fetch('/api/proxy/history', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      cache: 'no-store'
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
     }
+
+    const data = await res.json();
+    console.log('Historical data:', data);
+    return data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
   }
 } 

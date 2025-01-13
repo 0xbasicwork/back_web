@@ -1,13 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getIndexData, type IndexData, getAvailableEndpoints } from '@/lib/api';
+import { getIndexData, type IndexData, getHistoricalData, type HistoricalData } from '@/lib/api';
 import { DrunkenFont } from '../DrunkenFont';
 import { IndexMeter } from './IndexMeter';
+import { getMarketStatus } from '@/app/components/MarketStatus';
+import { IndexHistory } from './IndexHistory';
 
 export function OverBackIndex() {
   const [data, setData] = useState<IndexData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [historicalData, setHistoricalData] = useState<HistoricalData[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -28,8 +31,16 @@ export function OverBackIndex() {
   }, []);
 
   useEffect(() => {
-    // Add this to test endpoints
-    getAvailableEndpoints();
+    async function fetchHistoricalData() {
+      try {
+        const data = await getHistoricalData();
+        setHistoricalData(data);
+      } catch (err) {
+        console.error('Error fetching historical data:', err);
+      }
+    }
+
+    fetchHistoricalData();
   }, []);
 
   const titleContent = (
@@ -66,7 +77,13 @@ export function OverBackIndex() {
       {/* Main Score with Meter */}
       <div className="text-center mb-8">
         <IndexMeter value={data.score} />
-        <div className="text-gray-500 mt-2 font-mono">Current Index Score</div>
+        <div className="font-['Roboto_Mono'] font-bold text-[64px] mt-2 uppercase" 
+          style={{ 
+            color: getColorForStatus(data.score) 
+          }}
+        >
+          {getMarketStatus(data.score)}
+        </div>
       </div>
 
       {/* Components */}
@@ -111,10 +128,28 @@ export function OverBackIndex() {
         </div>
       </div>
 
+      {/* Historical Graph */}
+      <div className="mt-8">
+        <h2 className="text-xl font-bold mb-4 text-center">30 Day History</h2>
+        <IndexHistory data={historicalData} />
+      </div>
+
       {/* Last Updated */}
       <div className="text-center text-sm text-gray-500 mt-8 font-mono">
         Last Updated: {data.lastUpdated.replace('UTC', '').trim()}
       </div>
     </div>
   );
+}
+
+function getColorForStatus(index: number): string {
+  if (index <= 10) return '#EF4444';  // red-500
+  if (index <= 25) return '#F87171';  // red-400
+  if (index <= 35) return '#F97316';  // orange-500
+  if (index <= 45) return '#EAB308';  // yellow-500
+  if (index <= 55) return '#FACC15';  // yellow-400
+  if (index <= 65) return '#A3E635';  // lime-400
+  if (index <= 75) return '#84CC16';  // lime-500
+  if (index <= 90) return '#4ADE80';  // green-400
+  return '#22C55E';                   // green-500
 } 
