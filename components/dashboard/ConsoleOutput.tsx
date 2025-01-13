@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 
 interface LogEntry {
   timestamp: string;
-  type: 'log' | 'error';
+  type: 'success' | 'info' | 'system' | 'error' | 'log';
   message: string;
 }
 
@@ -41,18 +41,19 @@ export function ConsoleOutput() {
   useEffect(() => {
     async function fetchLogs() {
       try {
-        const params = new URLSearchParams({
-          limit: '100',
-          ...(filter !== 'all' && { type: filter })
-        });
+        console.log('Fetching logs from proxy...');
+        const res = await fetch(`/api/proxy/console`);
+        console.log('Proxy response status:', res.status);
         
-        const res = await fetch(`/api/console?${params}`);
         const data: ConsoleResponse = await res.json();
+        console.log('Received data:', data);
         
         if (data.logs && Array.isArray(data.logs)) {
+          console.log('Setting logs, count:', data.logs.length);
           setLogs(data.logs);
-          // Scroll to bottom after setting new logs
           setTimeout(scrollToBottom, 100);
+        } else {
+          console.warn('Invalid or empty logs data:', data);
         }
       } catch (error) {
         console.error('Error fetching logs:', error);
@@ -64,11 +65,31 @@ export function ConsoleOutput() {
     return () => clearInterval(interval);
   }, [filter]);
 
+  const getLogColor = (type: LogEntry['type']) => {
+    switch (type) {
+      case 'success': return 'text-green-400';
+      case 'info': return 'text-blue-400';
+      case 'system': return 'text-yellow-400';
+      case 'error': return 'text-red-400';
+      default: return 'text-gray-100';
+    }
+  };
+
+  const getLogIcon = (type: LogEntry['type']) => {
+    switch (type) {
+      case 'success': return '✓';
+      case 'info': return '→';
+      case 'system': return '•';
+      case 'error': return '❌';
+      default: return '';
+    }
+  };
+
   return (
     <div className="mt-8 font-mono">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-xl font-bold">Data Collection Logs</h2>
+          <h2 className="text-xl font-bold">Data Collection Progress</h2>
           <div className="px-2 py-0.5 bg-gray-200 rounded text-sm">
             {logs.length} entries
           </div>
@@ -113,14 +134,12 @@ export function ConsoleOutput() {
         {logs.map((log, index) => (
           <div 
             key={index}
-            className={`mb-1 font-mono text-sm ${
-              log.type === 'error' ? 'text-red-400' : 'text-green-400'
-            }`}
+            className={`mb-1 font-mono text-sm ${getLogColor(log.type)}`}
           >
             <span className="text-gray-500">
               {new Date(log.timestamp).toLocaleString()}
             </span>{' '}
-            <span className="text-gray-400">[{log.type}]</span>{' '}
+            <span className="text-gray-400">{getLogIcon(log.type)}</span>{' '}
             <span className="whitespace-pre-wrap">{log.message}</span>
           </div>
         ))}
