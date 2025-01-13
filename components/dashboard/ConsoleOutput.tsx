@@ -21,39 +21,44 @@ export function ConsoleOutput() {
   const [filter, setFilter] = useState<'all' | 'log' | 'error'>('all');
   const consoleRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
+  const lastScrollPosition = useRef(0);
 
-  // Function to scroll to bottom
+  // Only scroll if we're at the bottom when new logs come in
   const scrollToBottom = () => {
     if (consoleRef.current && autoScroll) {
-      consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
+      const { scrollHeight, clientHeight } = consoleRef.current;
+      const maxScroll = scrollHeight - clientHeight;
+      const currentScroll = lastScrollPosition.current;
+      
+      // Only auto-scroll if we're near the bottom
+      if (maxScroll - currentScroll < 50) {
+        consoleRef.current.scrollTop = scrollHeight;
+      }
     }
   };
 
-  // Handle manual scroll
+  // Track scroll position
   const handleScroll = () => {
     if (consoleRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = consoleRef.current;
+      lastScrollPosition.current = scrollTop;
+      
+      // Auto-scroll is enabled only when we're at the bottom
       const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
       setAutoScroll(isAtBottom);
     }
   };
 
+  // Fetch logs
   useEffect(() => {
     async function fetchLogs() {
       try {
-        console.log('Fetching logs from proxy...');
-        const res = await fetch(`/api/proxy/console`);
-        console.log('Proxy response status:', res.status);
-        
+        const res = await fetch('/api/proxy/console');
         const data: ConsoleResponse = await res.json();
-        console.log('Received data:', data);
         
         if (data.logs && Array.isArray(data.logs)) {
-          console.log('Setting logs, count:', data.logs.length);
           setLogs(data.logs);
           setTimeout(scrollToBottom, 100);
-        } else {
-          console.warn('Invalid or empty logs data:', data);
         }
       } catch (error) {
         console.error('Error fetching logs:', error);
@@ -96,7 +101,9 @@ export function ConsoleOutput() {
           <button
             onClick={() => {
               setAutoScroll(true);
-              scrollToBottom();
+              if (consoleRef.current) {
+                consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
+              }
             }}
             className={`px-2 py-0.5 rounded text-xs ${
               autoScroll ? 'bg-green-200' : 'bg-gray-200 hover:bg-gray-300'

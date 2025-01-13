@@ -14,29 +14,33 @@ function parseDate(dateStr: string): Date {
   }
 }
 
-function parseLogLine(line: string) {
+function parseLogLine(line: string, lastKnownTimestamp: string) {
+  // Check for "Last Updated:" line first to get the base timestamp
+  if (line.startsWith('Last Updated:')) {
+    const updateMatch = line.match(/Last Updated: (\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}:\d{2}) UTC/);
+    if (updateMatch) {
+      return {
+        timestamp: parseDate(updateMatch[1]).toISOString(),
+        type: 'system',
+        message: line.trim(),
+        hasExplicitTimestamp: true,
+        isUpdateLine: true
+      };
+    }
+  }
+
   // Skip empty lines and headers
-  if (!line.trim() || line.startsWith('Over & Back Index') || line.startsWith('Last Updated:')) {
+  if (!line.trim() || line.startsWith('Over & Back Index')) {
     return null;
   }
 
-  // Handle section headers with emojis
-  if (line.includes('🚀') || line.includes('📊') || line.includes('🐦') || line.includes('⛓️')) {
-    return {
-      timestamp: new Date().toISOString(),
-      type: 'system',
-      message: line.trim()
-    };
-  }
-
-  // Parse timestamped lines
+  // Parse timestamped lines first
   const timestampMatch = line.match(/(\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}:\d{2}) UTC:/);
   if (timestampMatch) {
     try {
       const timestamp = parseDate(timestampMatch[1]).toISOString();
       const message = line.split('UTC:')[1].trim();
 
-      // Determine log type based on content
       let type = 'info';
       if (message.includes('✓')) type = 'success';
       else if (message.includes('•')) type = 'system';
@@ -46,7 +50,8 @@ function parseLogLine(line: string) {
       return {
         timestamp,
         type,
-        message
+        message,
+        hasExplicitTimestamp: true
       };
     } catch (error) {
       console.error('Error parsing line:', line, error);
@@ -54,21 +59,20 @@ function parseLogLine(line: string) {
     }
   }
 
-  // Handle indented/formatted lines
-  if (line.startsWith('   ')) {
-    return {
-      timestamp: new Date().toISOString(),
-      type: 'info',
-      message: line.trim()
-    };
-  }
+  // For non-timestamped lines, use the last known timestamp
+  const type = line.includes('🚀') || line.includes('📊') || 
+               line.includes('🐦') || line.includes('⛓️') ? 'system' : 'info';
 
-  return null;
+  return {
+    timestamp: lastKnownTimestamp,
+    type,
+    message: line.trim(),
+    hasExplicitTimestamp: false
+  };
 }
 
 export async function GET() {
   try {
-    console.log('Fetching console logs...');
     const [currentRes, historyRes] = await Promise.all([
       fetch(API_URL),
       fetch(HISTORY_URL)
@@ -81,16 +85,43 @@ export async function GET() {
     const currentText = await currentRes.text();
     const historyText = await historyRes.text();
 
-    // Process both current and historical logs
-    const logs = [...currentText.split('\n'), ...historyText.split('\n')]
-      .map(parseLogLine)
-      .filter((log): log is NonNullable<typeof log> => log !== null)
-      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-
-    console.log('Processed logs count:', logs.length);
-    if (logs.length > 0) {
-      console.log('Sample log:', logs[0]);
+    // First find the "Last Updated" timestamp
+    const lines = [...historyText.split('\n'), ...currentText.split('\n')];
+    const updateLine = lines.find(line => line.startsWith('Last Updated:'));
+    let baseTimestamp = new Date().toISOString();
+    
+    if (updateLine) {
+      const updateMatch = updateLine.match(/Last Updated: (\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}:\d{2}) UTC/);
+      if (updateMatch) {
+        baseTimestamp = parseDate(updateMatch[1]).toISOString();
+      }
     }
+
+    // Process logs using the base timestamp
+    let lastKnownTimestamp = baseTimestamp;
+    const processedLogs: LogEntry[] = [];
+
+    lines
+      .map(line => parseLogLine(line, lastKnownTimestamp))
+      .filter((log): log is NonNullable<typeof log> => log !== null)
+      .forEach(log => {
+        if (log.hasExplicitTimestamp) {
+          lastKnownTimestamp = log.timestamp;
+        }
+        // Don't include the "Last Updated" line in the output
+        if (!('isUpdateLine' in log)) {
+          processedLogs.push({
+            timestamp: log.timestamp,
+            type: log.type,
+            message: log.message
+          });
+        }
+      });
+
+    // Sort by timestamp
+    const logs = processedLogs.sort((a, b) => 
+      new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+    );
 
     return NextResponse.json({
       logs,

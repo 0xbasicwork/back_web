@@ -34,6 +34,12 @@ interface IndexHistoryProps {
   data: HistoricalData[];
 }
 
+interface TooltipContext {
+  parsed: {
+    y: number;
+  };
+}
+
 export function IndexHistory({ data }: IndexHistoryProps) {
   console.log('IndexHistory received raw data:', JSON.stringify(data, null, 2));
   
@@ -103,7 +109,7 @@ export function IndexHistory({ data }: IndexHistoryProps) {
       },
       tooltip: {
         callbacks: {
-          label: (context: any) => `Index: ${context.parsed.y}`,
+          label: (context: TooltipContext) => `Index: ${context.parsed.y}`,
         },
       },
     },
