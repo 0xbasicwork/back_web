@@ -14,6 +14,12 @@ export interface IndexData {
 export async function getIndexData(): Promise<IndexData> {
   try {
     const res = await fetch(API_BASE_URL, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
       next: { revalidate: 60 }
     });
 
@@ -29,14 +35,10 @@ export async function getIndexData(): Promise<IndexData> {
     const sentimentMatch = html.match(/Social Sentiment[\s\S]*?value">(\d+)%<\/span>/);
     const onChainMatch = html.match(/On-chain Activity[\s\S]*?value">(\d+)%<\/span>/);
 
-    const score = parseFloat(scoreMatch?.[1] || '0');
-    const market = parseFloat(marketMatch?.[1] || '0');
-    const sentiment = parseFloat(sentimentMatch?.[1] || '0');
-    const onChain = parseFloat(onChainMatch?.[1] || '0');
-
-    // Get the last updated time
-    const lastUpdatedMatch = html.match(/Last updated: ([^<]+)/);
-    const lastUpdated = lastUpdatedMatch?.[1] || new Date().toISOString();
+    const score = parseFloat(scoreMatch?.[1] || '50');
+    const market = parseFloat(marketMatch?.[1] || '50');
+    const sentiment = parseFloat(sentimentMatch?.[1] || '50');
+    const onChain = parseFloat(onChainMatch?.[1] || '50');
 
     return {
       score,
@@ -46,7 +48,7 @@ export async function getIndexData(): Promise<IndexData> {
         sentiment,
         onChain
       },
-      lastUpdated
+      lastUpdated: new Date().toISOString()
     };
   } catch (error) {
     console.error('API Error:', error);

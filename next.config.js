@@ -1,9 +1,8 @@
 ﻿/** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   images: {
-    unoptimized: true,
+    domains: ['45.76.10.9'],
   }
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig
