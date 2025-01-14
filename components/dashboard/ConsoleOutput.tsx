@@ -159,19 +159,17 @@ export function ConsoleOutput() {
   };
 
   return (
-    <div className="mt-8 font-mono">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl font-bold">Data Collection Progress</h2>
-          <div className="px-2 py-0.5 bg-gray-200 rounded text-sm">
+    <div className="mt-4 md:mt-8 font-mono">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 md:mb-4 gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="text-lg md:text-xl font-bold">Data Collection Progress</h2>
+          <div className="px-2 py-0.5 bg-gray-200 rounded text-xs md:text-sm">
             {logs.length} entries
           </div>
           <button
             onClick={() => {
               setAutoScroll(true);
-              if (consoleRef.current) {
-                consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
-              }
+              scrollToBottom();
             }}
             className={`px-2 py-0.5 rounded text-xs ${
               autoScroll ? 'bg-green-200' : 'bg-gray-200 hover:bg-gray-300'
@@ -182,7 +180,7 @@ export function ConsoleOutput() {
         </div>
         <div className="flex gap-2">
           <select 
-            className="px-2 py-1 border rounded text-sm"
+            className="px-2 py-1 border rounded text-xs md:text-sm"
             value={filter}
             onChange={(e) => setFilter(e.target.value as typeof filter)}
           >
@@ -192,7 +190,7 @@ export function ConsoleOutput() {
           </select>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-sm"
+            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs md:text-sm"
           >
             {isExpanded ? 'Collapse' : 'Expand'}
           </button>
@@ -202,25 +200,25 @@ export function ConsoleOutput() {
       <div 
         ref={consoleRef}
         onScroll={handleScroll}
-        className={`bg-gray-900 text-gray-100 rounded-lg p-4 overflow-auto transition-all ${
-          isExpanded ? 'h-[500px]' : 'h-[200px]'
+        className={`bg-gray-900 text-gray-100 rounded-lg p-2 md:p-4 overflow-auto transition-all ${
+          isExpanded ? 'h-[400px] md:h-[500px]' : 'h-[150px] md:h-[200px]'
         }`}
       >
         {logs.map((log, index) => (
           <div 
             key={index}
-            className={`mb-1 font-mono text-sm ${getLogColor(log.type)}`}
+            className={`mb-1 font-mono text-xs md:text-sm ${getLogColor(log.type)}`}
           >
             {log.timestamp && (
               <span className="text-gray-500">
                 {log.timestamp}:{' '}
               </span>
             )}
-            <span className="whitespace-pre-wrap">{log.message}</span>
+            <span className="whitespace-pre-wrap break-words">{log.message}</span>
           </div>
         ))}
         {logs.length === 0 && (
-          <div className="text-gray-500 text-center mt-4">
+          <div className="text-gray-500 text-center mt-4 text-sm">
             No logs available
           </div>
         )}

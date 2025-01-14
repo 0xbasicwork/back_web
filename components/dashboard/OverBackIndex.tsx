@@ -58,9 +58,9 @@ export function OverBackIndex() {
   }, []);
 
   const titleContent = (
-    <div className="sticky top-0 bg-white z-10 pb-4 border-b border-gray-200">
-      <h1 className={`${DrunkenFont.className} text-center px-4`}>
-        <div className="text-4xl md:text-6xl text-black">
+    <div className="sticky top-0 bg-white z-10 pb-2 md:pb-4 border-b border-gray-200">
+      <h1 className={`${DrunkenFont.className} text-center px-2 md:px-4`}>
+        <div className="text-3xl md:text-6xl text-black">
           IS IT OVER... OR ARE WE BACK?
         </div>
       </h1>
@@ -101,11 +101,16 @@ export function OverBackIndex() {
     <div className="bg-white rounded-lg shadow-lg max-w-7xl mx-auto">
       {titleContent}
       
-      <div className="p-4 md:p-6">
+      <div className="p-3 md:p-6">
         {/* Main Score with Meter */}
-        <div className="text-center mb-6 md:mb-8">
-          <Meter value={data.score} />
-          <div className="font-['Roboto_Mono'] font-bold text-4xl md:text-[64px] mt-2 uppercase" 
+        <div className="text-center mb-4 md:mb-8">
+          <Meter 
+            value={data.score} 
+            size={window.innerWidth < 768 ? 300 : 500}  // Smaller on mobile
+            className="mx-auto w-full max-w-[300px] md:max-w-[500px]" 
+          />
+          <div 
+            className="font-['Roboto_Mono'] font-bold text-3xl md:text-[64px] mt-2 uppercase" 
             style={{ color: getColorForStatus(data.score) }}
           >
             {getMarketStatus(data.score)}
@@ -113,7 +118,7 @@ export function OverBackIndex() {
         </div>
 
         {/* Components */}
-        <div className="space-y-4 md:space-y-6 font-mono">
+        <div className="space-y-3 md:space-y-6 font-mono">
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-gray-600 text-sm md:text-base">Market</span>
