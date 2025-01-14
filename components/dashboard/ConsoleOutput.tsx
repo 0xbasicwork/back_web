@@ -3,16 +3,55 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface LogEntry {
-  timestamp: string;
-  type: 'success' | 'info' | 'system' | 'error' | 'log';
+  timestamp: string | null;  // null for section headers
+  type: 'success' | 'info' | 'system' | 'error' | 'log' | 'header' | 'subheader';
   message: string;
 }
 
-interface ConsoleResponse {
-  logs: LogEntry[];
-  total: number;
-  limit: number;
-  type: string;
+function parseLogLine(line: string): LogEntry | null {
+  try {
+    // Check if it's a section header (starts with emoji)
+    if (line.match(/^[^\s]/)) {  // Starts with non-whitespace (emoji)
+      return {
+        timestamp: null,
+        type: 'header',
+        message: line
+      };
+    }
+
+    // Check if it's a subheader (indented without timestamp)
+    if (line.startsWith('   ') && !line.includes('UTC:')) {
+      return {
+        timestamp: null,
+        type: 'subheader',
+        message: line.trim()
+      };
+    }
+
+    // Regular log line with timestamp
+    const match = line.match(/(\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}:\d{2} UTC): (.+)/);
+    if (match) {
+      const [, timestamp, messageWithIcon] = match;
+      
+      // Determine type based on icon
+      let type: LogEntry['type'] = 'log';
+      if (messageWithIcon.includes('✓')) type = 'success';
+      else if (messageWithIcon.includes('→')) type = 'info';
+      else if (messageWithIcon.includes('•')) type = 'system';
+      else if (messageWithIcon.includes('❌')) type = 'error';
+
+      return {
+        timestamp,
+        type,
+        message: messageWithIcon.trim()
+      };
+    }
+
+    return null;
+  } catch (err) {
+    console.error('Failed to parse log line:', line, err);
+    return null;
+  }
 }
 
 export function ConsoleOutput() {
@@ -23,54 +62,89 @@ export function ConsoleOutput() {
   const [autoScroll, setAutoScroll] = useState(true);
   const lastScrollPosition = useRef(0);
 
-  // Only scroll if we're at the bottom when new logs come in
   const scrollToBottom = useCallback(() => {
-    if (consoleRef.current) {
+    if (consoleRef.current && autoScroll) {
       consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
     }
-  }, []);
+  }, [autoScroll]);
 
-  // Track scroll position
   const handleScroll = () => {
     if (consoleRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = consoleRef.current;
       lastScrollPosition.current = scrollTop;
-      
-      // Auto-scroll is enabled only when we're at the bottom
       const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
       setAutoScroll(isAtBottom);
     }
   };
 
-  // Move fetchLogs into useCallback to avoid dependency issues
   const fetchLogs = useCallback(async () => {
     try {
-      // Use the proxy endpoint instead of direct API endpoint
-      const res = await fetch('/api/proxy/console', {
-        cache: 'no-store',
-        headers: {
-          'Accept': 'text/plain',
-        },
-      });
-      const data: ConsoleResponse = await res.json();
+      console.log('Fetching console logs...');
       
-      if (data.logs && Array.isArray(data.logs)) {
-        setLogs(data.logs);
-        setTimeout(scrollToBottom, 100);
-      }
+      const [currentRes, historyRes] = await Promise.all([
+        fetch('/api/proxy/console', {
+          cache: 'no-store',
+          headers: { 'Accept': 'text/plain' },
+        }),
+        fetch('/api/proxy/console/history', {
+          cache: 'no-store',
+          headers: { 'Accept': 'text/plain' },
+        })
+      ]);
+
+      const currentText = await currentRes.text();
+      const historyText = await historyRes.text();
+
+      // Parse logs from text format
+      const currentLogs = currentText.split('\n')
+        .filter(line => line.trim())
+        .map(parseLogLine)
+        .filter(Boolean) as LogEntry[];
+
+      const historyLogs = historyText.split('\n')
+        .filter(line => line.trim())
+        .map(parseLogLine)
+        .filter(Boolean) as LogEntry[];
+
+      // Combine all logs first to maintain header order
+      const combinedLogs = [...historyLogs, ...currentLogs];
+
+      // Sort only the timestamped logs while preserving header positions
+      const allLogs = combinedLogs.map(log => {
+        // If this is a timestamped log, find the nearest sorted position
+        if (log.timestamp) {
+          const timestamp = new Date(log.timestamp).getTime();
+          const nearestTimestampedLog = combinedLogs
+            .filter((l): l is LogEntry & { timestamp: string } => {
+              return l.timestamp !== null && new Date(l.timestamp).getTime() <= timestamp;
+            })
+            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+          
+          return nearestTimestampedLog || log;
+        }
+        // Return headers and subheaders as-is
+        return log;
+      });
+
+      // Filter logs if needed
+      const filteredLogs = filter === 'all' 
+        ? allLogs 
+        : allLogs.filter(log => log.type === filter);
+
+      setLogs(filteredLogs);
+      setTimeout(scrollToBottom, 100);
     } catch (error) {
       console.error('Error fetching logs:', error);
     }
-  }, [scrollToBottom]);
+  }, [filter, scrollToBottom]);
 
-  // Only run the effect on the client side
   useEffect(() => {
     if (typeof window !== 'undefined') {
       fetchLogs();
       const interval = setInterval(fetchLogs, 10000);
       return () => clearInterval(interval);
     }
-  }, [fetchLogs, filter]);
+  }, [fetchLogs]);
 
   const getLogColor = (type: LogEntry['type']) => {
     switch (type) {
@@ -78,23 +152,11 @@ export function ConsoleOutput() {
       case 'info': return 'text-blue-400';
       case 'system': return 'text-yellow-400';
       case 'error': return 'text-red-400';
+      case 'header': return 'text-purple-400 font-bold text-lg';
+      case 'subheader': return 'text-gray-400 italic';
       default: return 'text-gray-100';
     }
   };
-
-  const getLogIcon = (type: LogEntry['type']) => {
-    switch (type) {
-      case 'success': return '✓';
-      case 'info': return '→';
-      case 'system': return '•';
-      case 'error': return '❌';
-      default: return '';
-    }
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [logs, scrollToBottom]);
 
   return (
     <div className="mt-8 font-mono">
@@ -149,10 +211,11 @@ export function ConsoleOutput() {
             key={index}
             className={`mb-1 font-mono text-sm ${getLogColor(log.type)}`}
           >
-            <span className="text-gray-500">
-              {new Date(log.timestamp).toLocaleString()}
-            </span>{' '}
-            <span className="text-gray-400">{getLogIcon(log.type)}</span>{' '}
+            {log.timestamp && (
+              <span className="text-gray-500">
+                {log.timestamp}:{' '}
+              </span>
+            )}
             <span className="whitespace-pre-wrap">{log.message}</span>
           </div>
         ))}

@@ -6,7 +6,7 @@ import { FaWolfPackBattalion } from 'react-icons/fa';
 import { SiHiveBlockchain } from 'react-icons/si';
 import { FaXTwitter, FaTelegram, FaTiktok } from 'react-icons/fa6';
 import { RiMenu3Line, RiCloseLine } from 'react-icons/ri';
-import MarketStatus from './MarketStatus';
+import MarketStatusIndicator from './MarketStatusIndicator';
 
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -79,7 +79,7 @@ export default function NavBar() {
 
         {/* Right side - Market Status and Menu */}
         <div className="flex items-center gap-1.5 md:gap-2">
-          <MarketStatus />
+          <MarketStatusIndicator />
           <button 
             className="md:hidden text-lg text-black p-1"
             onClick={() => setIsMenuOpen(!isMenuOpen)}

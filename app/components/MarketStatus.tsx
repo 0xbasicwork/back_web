@@ -3,10 +3,14 @@
 import { useEffect, useState } from 'react';
 
 interface IndexData {
-  index: number;
-  market_data: number;
-  social_sentiment: number;
-  onchain_activity: number;
+  score: number;
+  label: string;
+  components: {
+    market: number;
+    sentiment: number;
+    onChain: number;
+  };
+  lastUpdated: string;
 }
 
 export function getMarketStatus(score: number): string {
@@ -51,12 +55,12 @@ function getLEDColorForIndex(index: number): string {
 export default function MarketStatus() {
   const [status, setStatus] = useState('Loading...');
   const [error, setError] = useState<string | null>(null);
-  const [index, setIndex] = useState(48);
+  const [score, setScore] = useState(50);
 
   useEffect(() => {
     const fetchIndex = async () => {
       try {
-        const response = await fetch('/api/index', {
+        const response = await fetch('/api/proxy', {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -65,28 +69,17 @@ export default function MarketStatus() {
         });
 
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error('Response not ok:', response.status, errorText);
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data: IndexData = await response.json();
-        console.log('Index data:', data);
-        setIndex(data.index);
-        
-        // Interpret the index value
-        const marketStatus = getMarketStatus(data.index);
-        
-        setStatus(marketStatus);
+        setScore(data.score);
+        setStatus(getMarketStatus(data.score));
         setError(null);
-      } catch (error: unknown) {
+      } catch (error) {
         console.error('Error fetching index:', error);
-        if (error instanceof Error) {
-          setError(error.message);
-        } else {
-          setError('An unknown error occurred');
-        }
-        setStatus('WE VIBING'); // Updated default fallback
+        setError(error instanceof Error ? error.message : 'An unknown error occurred');
+        setStatus(error instanceof Error ? error.message : 'Error loading status');
       }
     };
 
@@ -96,13 +89,17 @@ export default function MarketStatus() {
   }, []);
 
   if (error) {
-    console.error('Rendering error state:', error);
+    return (
+      <div className="flex items-center gap-2 font-[var(--font-roboto-mono)] bg-black text-white px-3 py-2 rounded-full text-sm md:text-base">
+        <span className="text-red-500">Error: {error}</span>
+      </div>
+    );
   }
 
   return (
     <div className="flex items-center gap-2 font-[var(--font-roboto-mono)] bg-black text-white px-3 py-2 rounded-full text-sm md:text-base">
       <div className="flex items-center gap-2">
-        <div className={`w-1.5 md:w-2 h-1.5 md:h-2 rounded-full ${getLEDColorForIndex(index)} animate-pulse`} />
+        <div className={`w-1.5 md:w-2 h-1.5 md:h-2 rounded-full ${getLEDColorForIndex(score)} animate-pulse`} />
         <span className="text-gray-300 whitespace-nowrap">MARKET STATUS:</span>
       </div>
       <span 

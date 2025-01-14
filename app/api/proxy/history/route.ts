@@ -1,17 +1,15 @@
 import { NextResponse } from 'next/server';
 
+const API_BASE_URL = 'http://45.76.10.9:3000';
+
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
 export async function GET() {
   try {
-    // During build time, return empty array
-    if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'build') {
-      return NextResponse.json([]);
-    }
-
-    const response = await fetch('http://45.76.10.9:3000/api/history', {
-      method: 'GET',
+    console.log('Attempting to fetch from:', `${API_BASE_URL}/api/history`);
+    
+    const response = await fetch(`${API_BASE_URL}/api/history`, {
       headers: {
         'Accept': 'application/json',
       },
@@ -19,13 +17,19 @@ export async function GET() {
     });
 
     if (!response.ok) {
+      console.error(`API responded with status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('Successfully fetched data:', data);
     return NextResponse.json(data);
+
   } catch (error) {
-    console.error('Proxy API Error:', error);
-    return new NextResponse(null, { status: 500 });
+    console.error('Historical proxy error:', error);
+    // Return empty array instead of error response
+    return NextResponse.json([]);
   }
-} 
+}

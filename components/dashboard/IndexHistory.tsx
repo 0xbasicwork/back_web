@@ -25,19 +25,40 @@ ChartJS.register(
   TimeScale
 );
 
-interface HistoricalData {
-  timestamp: string;
-  value: number;
+interface HistoricalDataPoint {
+  timestamp: string;  // "DD/MM/YYYY, HH:mm:ss UTC"
+  score: number;
+  label: string;
+  components: {
+    market: number;
+    sentiment: number;
+    onChain: number;
+  };
+  details: {
+    marketMetrics: Record<string, number>;
+    sentimentMetrics: Record<string, number>;
+    onChainMetrics: Record<string, number>;
+  };
 }
 
 interface IndexHistoryProps {
-  data: HistoricalData[];
+  data: HistoricalDataPoint[];
 }
 
 interface TooltipContext {
   parsed: {
     y: number;
   };
+}
+
+function parseDate(dateStr: string) {
+  // Input format: "DD/MM/YYYY, HH:mm:ss UTC"
+  const [datePart, timePart] = dateStr.split(', ');
+  const [day, month, year] = datePart.split('/');
+  const [time] = timePart.split(' '); // Remove UTC
+  
+  // Create date in format: "YYYY-MM-DD HH:mm:ss"
+  return new Date(`${year}-${month}-${day} ${time}`);
 }
 
 export function IndexHistory({ data }: IndexHistoryProps) {
@@ -47,17 +68,15 @@ export function IndexHistory({ data }: IndexHistoryProps) {
     console.error('Data is not an array:', data);
     return (
       <div className="h-[300px] w-full flex flex-col items-center justify-center text-gray-500">
-        <div>No historical data available (invalid data format)</div>
-        <div className="text-sm mt-2">Received: {JSON.stringify(data)}</div>
+        <div>No historical data available</div>
       </div>
     );
   }
 
   if (data.length === 0) {
-    console.warn('Historical data array is empty');
     return (
       <div className="h-[300px] w-full flex items-center justify-center text-gray-500">
-        No historical data available (empty dataset)
+        No historical data available
       </div>
     );
   }
@@ -65,37 +84,22 @@ export function IndexHistory({ data }: IndexHistoryProps) {
   const validData = data.filter(point => {
     const isValid = point && 
                    typeof point.timestamp === 'string' && 
-                   typeof point.value === 'number' &&
-                   !isNaN(point.value);
+                   typeof point.score === 'number' &&
+                   !isNaN(point.score);
     if (!isValid) {
       console.warn('Invalid data point:', point);
     }
     return isValid;
   });
 
-  console.log('Valid data points:', validData.length);
-  console.log('First valid point:', validData[0]);
-
-  if (validData.length === 0) {
-    return (
-      <div className="h-[300px] w-full flex items-center justify-center text-gray-500">
-        No valid historical data points found
-      </div>
-    );
-  }
-
   const chartData = {
     datasets: [
       {
         label: 'Index Value',
-        data: validData.map(point => {
-          const [datePart] = point.timestamp.split(' ');
-          const [day, month, year] = datePart.split('/');
-          return {
-            x: new Date(`${year}-${month}-${day}`),
-            y: point.value
-          };
-        }),
+        data: validData.map(point => ({
+          x: parseDate(point.timestamp),
+          y: point.score
+        })),
         borderColor: '#84CC16',
         backgroundColor: 'rgba(132, 204, 22, 0.1)',
         fill: true,

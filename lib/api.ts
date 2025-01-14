@@ -121,25 +121,29 @@ export async function getIndexData(): Promise<IndexData> {
 //   }
 // }
 
-export interface HistoricalData {
-  timestamp: string;
-  value: number;
+export interface HistoricalDataPoint {
+  timestamp: string;  // "DD/MM/YYYY, HH:mm:ss UTC"
+  score: number;
+  label: string;
+  components: {
+    market: number;
+    sentiment: number;
+    onChain: number;
+  };
+  details: {
+    marketMetrics: Record<string, number>;
+    sentimentMetrics: Record<string, number>;
+    onChainMetrics: Record<string, number>;
+  };
 }
 
-// Add proper type for the mapped data
-interface HistoryDataPoint {
-  timestamp?: string;
-  date?: string;
-  score?: number;
-  value?: number;
-}
-
-export async function getHistoricalData(): Promise<HistoricalData[]> {
+export async function getHistoricalData(): Promise<HistoricalDataPoint[]> {
   try {
     console.log('Fetching historical data via proxy');
     
     const baseUrl = getBaseUrl();
     const proxyUrl = `${baseUrl}/api/proxy/history`;
+    console.log('Fetching from URL:', proxyUrl);
 
     const res = await fetch(proxyUrl, {
       method: 'GET',
@@ -155,28 +159,17 @@ export async function getHistoricalData(): Promise<HistoricalData[]> {
     }
 
     const rawData = await res.json();
-    console.log('Raw historical data:', rawData);
+    console.log('Raw historical data from API:', rawData);
 
     if (!Array.isArray(rawData)) {
       console.error('Historical data is not an array:', rawData);
       return [];
     }
 
-    const mappedData = rawData
-      .map((item: HistoryDataPoint) => ({
-        timestamp: item.timestamp || item.date || '',  // Provide empty string as fallback
-        value: item.score || item.value || 0
-      }))
-      .filter(item => item.timestamp !== ''); // Filter out items with empty timestamps
-
-    console.log('Mapped historical data:', mappedData);
-    return mappedData;
+    // The data already matches our interface, no need to transform
+    return rawData;
   } catch (error) {
     console.error('Historical API Error:', error);
-    // Return empty array during build
-    if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'build') {
-      return [];
-    }
     return [];
   }
 }
