@@ -1,18 +1,40 @@
 import { NextResponse } from 'next/server';
-import { getIndexData } from '@/lib/api';
+
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
 export async function GET() {
   try {
-    const data = await getIndexData();
+    // During build time, return default data
+    if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'build') {
+      return NextResponse.json({
+        score: 50,
+        label: 'Loading...',
+        components: {
+          market: 50,
+          sentiment: 50,
+          onChain: 50
+        },
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const response = await fetch('http://45.76.10.9:3000/api/latest', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error('API Error:', error);
-    // Return fallback data instead of error
-    return NextResponse.json({
-      index: 47,
-      market_data: 59,
-      social_sentiment: 35,
-      onchain_activity: 43
-    });
+    return new NextResponse(null, { status: 500 });
   }
 } 

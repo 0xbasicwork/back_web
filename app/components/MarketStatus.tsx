@@ -9,47 +9,43 @@ interface IndexData {
   onchain_activity: number;
 }
 
-interface MarketStatusConfig {
-  threshold: number;
-  message: string;
+export function getMarketStatus(score: number): string {
+  if (score < 20) {
+    return 'IT\'S SO OVER';
+  } else if (score < 40) {
+    return 'IT IS WHAT IT IS';
+  } else if (score < 60) {
+    return 'WE VIBING';
+  } else if (score < 80) {
+    return 'WE\'RE SO BACK';
+  } else {
+    return 'LET\'S FKN GOOO!';
+  }
 }
 
-const STATUS_LEVELS: MarketStatusConfig[] = [
-  { threshold: 90, message: 'LET\'S FUCKING GOOO!' },
-  { threshold: 75, message: 'We are so back.' },
-  { threshold: 60, message: 'We\'re back.' },
-  { threshold: 50, message: 'We vibing.' },
-  { threshold: 30, message: 'It is what it is.' },
-  { threshold: 15, message: 'It\'s over.' },
-  { threshold: 0,  message: 'It\'s so over.' },
-];
-
-export function getMarketStatus(index: number): string {
-  return STATUS_LEVELS.find(level => index > level.threshold)?.message || STATUS_LEVELS[STATUS_LEVELS.length - 1].message;
-}
-
-function getColorForIndex(index: number): string {
-  if (index <= 10) return 'text-red-500';
-  if (index <= 25) return 'text-red-400';
-  if (index <= 35) return 'text-orange-500';
-  if (index <= 45) return 'text-yellow-500';
-  if (index <= 55) return 'text-yellow-400';
-  if (index <= 65) return 'text-lime-400';
-  if (index <= 75) return 'text-lime-500';
-  if (index <= 90) return 'text-green-400';
-  return 'text-green-500';
+export function getStatusColor(status: string): string {
+  switch (status) {
+    case 'IT\'S SO OVER':
+      return 'text-red-500';
+    case 'IT IS WHAT IT IS':
+      return 'text-orange-500';
+    case 'WE VIBING':
+      return 'text-yellow-500';
+    case 'WE\'RE SO BACK':
+      return 'text-green-500';
+    case 'LET\'S FKN GOOO!':
+      return 'text-emerald-500';
+    default:
+      return 'text-gray-500';
+  }
 }
 
 function getLEDColorForIndex(index: number): string {
-  if (index <= 10) return 'bg-red-500';
-  if (index <= 25) return 'bg-red-400';
-  if (index <= 35) return 'bg-orange-500';
-  if (index <= 45) return 'bg-yellow-500';
-  if (index <= 55) return 'bg-yellow-400';
-  if (index <= 65) return 'bg-lime-400';
-  if (index <= 75) return 'bg-lime-500';
-  if (index <= 90) return 'bg-green-400';
-  return 'bg-green-500';
+  if (index < 20) return 'bg-red-500';
+  if (index < 40) return 'bg-orange-500';
+  if (index < 60) return 'bg-yellow-500';
+  if (index < 80) return 'bg-green-500';
+  return 'bg-emerald-500';
 }
 
 export default function MarketStatus() {
@@ -90,7 +86,7 @@ export default function MarketStatus() {
         } else {
           setError('An unknown error occurred');
         }
-        setStatus('We are so back.'); // Default fallback
+        setStatus('WE VIBING'); // Updated default fallback
       }
     };
 
@@ -110,7 +106,7 @@ export default function MarketStatus() {
         <span className="text-gray-300 whitespace-nowrap">MARKET STATUS:</span>
       </div>
       <span 
-        className={`font-bold animate-[breathing_3s_ease-in-out_infinite] ${getColorForIndex(index)} whitespace-nowrap`}
+        className={`font-bold animate-[breathing_3s_ease-in-out_infinite] ${getStatusColor(status)} whitespace-nowrap`}
       >
         {status}
       </span>

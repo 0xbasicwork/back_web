@@ -1,21 +1,13 @@
-import NavBar from '@/app/components/NavBar';
-import Footer from '@/app/components/Footer';
 import { OverBackIndex } from '@/components/dashboard/OverBackIndex';
+import Footer from '@/app/components/Footer';
 
 export default function DashboardPage() {
   return (
-    <>
-      <NavBar />
-      <div className="pt-24 md:pt-32">
-        <div className="container mx-auto p-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="md:col-span-2">
-              <OverBackIndex />
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen flex flex-col bg-gray-100">
+      <main className="flex-1 p-4">
+        <OverBackIndex />
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }

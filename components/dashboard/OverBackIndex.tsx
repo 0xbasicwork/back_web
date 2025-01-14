@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react';
 import { getIndexData, type IndexData, getHistoricalData, type HistoricalData } from '@/lib/api';
 import { DrunkenFont } from '../DrunkenFont';
-import { IndexMeter } from './IndexMeter';
+import { Meter } from './Meter';
 import { getMarketStatus } from '@/app/components/MarketStatus';
 import { IndexHistory } from './IndexHistory';
 import { ConsoleOutput } from './ConsoleOutput';
+import { format } from 'date-fns';
 
 export function OverBackIndex() {
   const [data, setData] = useState<IndexData | null>(null);
@@ -17,6 +18,7 @@ export function OverBackIndex() {
     async function fetchData() {
       try {
         const indexData = await getIndexData();
+        console.log('Latest API data:', indexData);
         setData(indexData);
       } catch (err: unknown) {
         console.error('Fetch error:', err);
@@ -34,7 +36,9 @@ export function OverBackIndex() {
   useEffect(() => {
     async function fetchHistoricalData() {
       try {
+        console.log('Fetching historical data...');
         const data = await getHistoricalData();
+        console.log('Received historical data:', data);
         setHistoricalData(data);
       } catch (err) {
         console.error('Error fetching historical data:', err);
@@ -71,17 +75,24 @@ export function OverBackIndex() {
     );
   }
 
+  const formattedDate = (dateString: string) => {
+    try {
+      return `${format(new Date(dateString), 'dd/MM/yyyy HH:mm')} UTC`;
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return dateString; // fallback to original string if parsing fails
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       {titleContent}
       
       {/* Main Score with Meter */}
       <div className="text-center mb-8">
-        <IndexMeter value={data.score} />
+        <Meter value={data.score} />
         <div className="font-['Roboto_Mono'] font-bold text-[64px] mt-2 uppercase" 
-          style={{ 
-            color: getColorForStatus(data.score) 
-          }}
+          style={{ color: getColorForStatus(data.score) }}
         >
           {getMarketStatus(data.score)}
         </div>
@@ -140,20 +151,16 @@ export function OverBackIndex() {
 
       {/* Last Updated */}
       <div className="text-center text-sm text-gray-500 mt-8 font-mono">
-        Last Updated: {data.lastUpdated.replace('UTC', '').trim()}
+        Last Updated: {formattedDate(data.lastUpdated)}
       </div>
     </div>
   );
 }
 
 function getColorForStatus(index: number): string {
-  if (index <= 10) return '#EF4444';  // red-500
-  if (index <= 25) return '#F87171';  // red-400
-  if (index <= 35) return '#F97316';  // orange-500
-  if (index <= 45) return '#EAB308';  // yellow-500
-  if (index <= 55) return '#FACC15';  // yellow-400
-  if (index <= 65) return '#A3E635';  // lime-400
-  if (index <= 75) return '#84CC16';  // lime-500
-  if (index <= 90) return '#4ADE80';  // green-400
-  return '#22C55E';                   // green-500
+  if (index < 20) return '#EF4444';  // red-500 - IT'S SO OVER
+  if (index < 40) return '#F97316';  // orange-500 - IT IS WHAT IT IS
+  if (index < 60) return '#EAB308';  // yellow-500 - WE VIBING
+  if (index < 80) return '#22C55E';  // green-500 - WE'RE SO BACK
+  return '#10B981';                  // emerald-500 - LET'S FKN GOOO!
 } 

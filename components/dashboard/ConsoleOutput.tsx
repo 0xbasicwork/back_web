@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface LogEntry {
   timestamp: string;
@@ -24,18 +24,11 @@ export function ConsoleOutput() {
   const lastScrollPosition = useRef(0);
 
   // Only scroll if we're at the bottom when new logs come in
-  const scrollToBottom = () => {
-    if (consoleRef.current && autoScroll) {
-      const { scrollHeight, clientHeight } = consoleRef.current;
-      const maxScroll = scrollHeight - clientHeight;
-      const currentScroll = lastScrollPosition.current;
-      
-      // Only auto-scroll if we're near the bottom
-      if (maxScroll - currentScroll < 50) {
-        consoleRef.current.scrollTop = scrollHeight;
-      }
+  const scrollToBottom = useCallback(() => {
+    if (consoleRef.current) {
+      consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
     }
-  };
+  }, []);
 
   // Track scroll position
   const handleScroll = () => {
@@ -49,26 +42,35 @@ export function ConsoleOutput() {
     }
   };
 
-  // Fetch logs
-  useEffect(() => {
-    async function fetchLogs() {
-      try {
-        const res = await fetch('/api/proxy/console');
-        const data: ConsoleResponse = await res.json();
-        
-        if (data.logs && Array.isArray(data.logs)) {
-          setLogs(data.logs);
-          setTimeout(scrollToBottom, 100);
-        }
-      } catch (error) {
-        console.error('Error fetching logs:', error);
+  // Move fetchLogs into useCallback to avoid dependency issues
+  const fetchLogs = useCallback(async () => {
+    try {
+      // Use the proxy endpoint instead of direct API endpoint
+      const res = await fetch('/api/proxy/console', {
+        cache: 'no-store',
+        headers: {
+          'Accept': 'text/plain',
+        },
+      });
+      const data: ConsoleResponse = await res.json();
+      
+      if (data.logs && Array.isArray(data.logs)) {
+        setLogs(data.logs);
+        setTimeout(scrollToBottom, 100);
       }
+    } catch (error) {
+      console.error('Error fetching logs:', error);
     }
+  }, [scrollToBottom]);
 
-    fetchLogs();
-    const interval = setInterval(fetchLogs, 10000);
-    return () => clearInterval(interval);
-  }, [filter]);
+  // Only run the effect on the client side
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      fetchLogs();
+      const interval = setInterval(fetchLogs, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [fetchLogs, filter]);
 
   const getLogColor = (type: LogEntry['type']) => {
     switch (type) {
@@ -89,6 +91,10 @@ export function ConsoleOutput() {
       default: return '';
     }
   };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [logs, scrollToBottom]);
 
   return (
     <div className="mt-8 font-mono">

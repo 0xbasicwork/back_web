@@ -21,5 +21,5 @@ export default function RootLayout({
     <html lang="en" className={drunkenFont.variable}>
       <body className={`min-h-screen ${robotoMono.className}`}>{children}</body>
     </html>
-  )
+  );
 }

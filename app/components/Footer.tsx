@@ -46,7 +46,7 @@ export default function Footer() {
         </div>
         <div className="text-white text-[10px] md:text-[14px] text-center" style={{ fontFamily: 'var(--font-roboto-mono)' }}>
           <p className="mb-1 md:mb-2">
-            All rights reserved © 2024{' '}
+            All rights reserved © 2025{' '}
             <Link 
               href="https://www.workforyourbags.lol/" 
               target="_blank"
