@@ -162,7 +162,7 @@ export function ConsoleOutput() {
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-2 md:mb-4 gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-lg md:text-xl font-bold">Data Collection Progress</h2>
-          <div className="px-2 py-0.5 bg-gray-200 rounded text-xs md:text-sm">
+          <div className="px-2 py-1 bg-gray-200 rounded text-xs md:text-sm h-7">
             {logs.length} entries
           </div>
           <button
@@ -170,7 +170,7 @@ export function ConsoleOutput() {
               setAutoScroll(true);
               scrollToBottom();
             }}
-            className={`px-2 py-0.5 rounded text-xs ${
+            className={`px-2 py-1 rounded text-xs md:text-sm h-7 ${
               autoScroll ? 'bg-green-200' : 'bg-gray-200 hover:bg-gray-300'
             }`}
           >
@@ -179,7 +179,7 @@ export function ConsoleOutput() {
         </div>
         <div className="flex gap-2">
           <select 
-            className="px-2 py-1 border rounded text-xs md:text-sm"
+            className="px-2 py-1 border rounded text-xs md:text-sm h-7"
             value={filter}
             onChange={(e) => setFilter(e.target.value as typeof filter)}
           >
@@ -189,7 +189,7 @@ export function ConsoleOutput() {
           </select>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs md:text-sm"
+            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs md:text-sm h-7"
           >
             {isExpanded ? 'Collapse' : 'Expand'}
           </button>

@@ -141,7 +141,7 @@ export function OverBackIndex() {
   return (
     <div className='min-h-screen bg-gradient-to-b from-gray-50 to-gray-100'>
       <div className='sticky top-0 bg-white/95 backdrop-blur-sm z-10 border-b border-gray-200 shadow-md'>
-        <h1 className={`${DrunkenFont.className} text-center px-2 md:px-4 py-4`}>
+        <h1 className={`${DrunkenFont.className} text-center px-2 md:px-4 py-4 md:py-6`}>
           <div 
             key={headerText}
             className='text-4xl md:text-8xl text-black opacity-0 animate-fadeIn'
@@ -167,7 +167,7 @@ export function OverBackIndex() {
                 className='font-mono font-bold text-3xl md:text-[48px] text-center md:text-left uppercase tracking-tight'
                 style={{ color: getColorForStatus(data.score) }}
               >
-                <span className='text-black'>STATUS: </span>
+                <span className='text-black block md:inline'>STATUS:</span>
                 {getMarketStatus(data.score)}
               </div>
 
