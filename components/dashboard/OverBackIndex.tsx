@@ -179,7 +179,7 @@ export function OverBackIndex() {
                     { label: 'Yesterday', status: data.previousStatus, score: data.previousScore },
                     { label: '1 week ago', status: 'COMING SOON', score: null, disabled: true },
                     { label: '1 month ago', status: 'COMING SOON', score: null, disabled: true },
-                    { label: '1 year ago', status: 'COMING SOON', score: null, disabled: true }
+                    { label: '1 year ago', status: 'EVENTUALLY', score: null, disabled: true }
                   ].map((item, index) => (
                     <div 
                       key={index}
