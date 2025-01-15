@@ -1,5 +1,11 @@
 import { OverBackIndex } from '@/components/dashboard/OverBackIndex';
 import Footer from '@/app/components/Footer';
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'The Over or Back Index',
+  description: 'Real-time market sentiment analysis for Solana',
+}
 
 export default function DashboardPage() {
   return (
