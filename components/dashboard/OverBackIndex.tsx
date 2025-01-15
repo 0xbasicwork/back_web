@@ -141,7 +141,7 @@ export function OverBackIndex() {
   return (
     <div className='min-h-screen bg-gradient-to-b from-gray-50 to-gray-100'>
       <div className='sticky top-0 bg-white/95 backdrop-blur-sm z-10 border-b border-gray-200 shadow-md'>
-        <h1 className={`${DrunkenFont.className} text-center px-2 md:px-4 py-4 md:py-6`}>
+        <h1 className={`${DrunkenFont.className} text-center px-2 md:px-4 py-4`}>
           <div 
             key={headerText}
             className='text-4xl md:text-8xl text-black opacity-0 animate-fadeIn'
@@ -272,14 +272,14 @@ export function OverBackIndex() {
         </div>
 
         <div className='mt-6 text-center'>
-          <div className='inline-flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 cursor-pointer'
+          <div className='inline-flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 cursor-pointer flex-wrap justify-center'
                onClick={() => copyToClipboard('AUiXW4YH5TLNFBgVayFBRvgWTz2ApeeM1Br7FCoyrugj')}>
-            <span className='font-mono text-sm text-gray-600'>$BACK:</span>
-            <span className='font-mono text-sm'>AUiXW4YH5TLNFBgVayFBRvgWTz2ApeeM1Br7FCoyrugj</span>
+            <span className='font-mono text-sm text-gray-600 mr-1'>$BACK:</span>
+            <span className='font-mono text-xs sm:text-sm break-all max-w-[200px] sm:max-w-none'>AUiXW4YH5TLNFBgVayFBRvgWTz2ApeeM1Br7FCoyrugj</span>
             {copyFeedback ? (
-              <span className='text-green-500 text-sm'>✓ Copied!</span>
+              <span className='text-green-500 text-sm ml-1'>✓ Copied!</span>
             ) : (
-              <svg className='w-4 h-4 text-gray-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <svg className='w-4 h-4 text-gray-500 ml-1 flex-shrink-0' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2' />
               </svg>
             )}
