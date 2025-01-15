@@ -187,5 +187,14 @@
   <circle class="cls-18" cx="87.89" cy="89.38" r="25.37" transform="translate(-37.46 88.33) rotate(-45)"/>
   <path class="cls-7" d="M113.26,89.38c0,14.01-11.36,25.37-25.37,25.37s-25.37-11.36-25.37-25.37h50.74Z"/>
   <circle class="cls-15" cx="87.89" cy="89.38" r="23.33" transform="translate(-37.46 88.33) rotate(-45)"/>
-  <text id="score" class="cls-13" transform="translate(69.78 98)"><tspan x="0" y="0">100</tspan></text>
+  <text 
+    id="score" 
+    x="87.89"
+    y="92.38"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    font-family="Roboto Mono"
+    font-size="32px"
+    font-weight="bold"
+  >58</text>
 </svg>

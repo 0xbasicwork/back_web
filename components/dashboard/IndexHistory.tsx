@@ -13,6 +13,7 @@ import {
   TimeScale
 } from 'chart.js';
 import 'chartjs-adapter-date-fns';
+import { getMarketStatus } from '@/app/components/MarketStatus';
 
 ChartJS.register(
   CategoryScale,
@@ -45,9 +46,24 @@ interface IndexHistoryProps {
   data: HistoricalDataPoint[];
 }
 
-interface TooltipContext {
+interface ChartContext {
+  p0: { parsed: { y: number } } | undefined;
+  p1: { parsed: { y: number } } | undefined;
+}
+
+interface ChartPoint {
+  parsed: { y: number } | undefined;
+}
+
+interface TooltipItem {
   parsed: {
     y: number;
+  };
+}
+
+interface TooltipContext {
+  tooltip: {
+    dataPoints: Array<TooltipItem>;
   };
 }
 
@@ -59,6 +75,14 @@ function parseDate(dateStr: string) {
   
   // Create date in format: "YYYY-MM-DD HH:mm:ss"
   return new Date(`${year}-${month}-${day} ${time}`);
+}
+
+function getColorForScore(score: number): string {
+  if (score < 20) return '#EF4444';  // red-500
+  if (score < 40) return '#F97316';  // orange-500
+  if (score < 60) return '#EAB308';  // yellow-500
+  if (score < 80) return '#22C55E';  // green-500
+  return '#10B981';                  // emerald-500
 }
 
 export function IndexHistory({ data }: IndexHistoryProps) {
@@ -100,10 +124,23 @@ export function IndexHistory({ data }: IndexHistoryProps) {
           x: parseDate(point.timestamp),
           y: point.score
         })),
-        borderColor: '#84CC16',
-        backgroundColor: 'rgba(132, 204, 22, 0.1)',
-        fill: true,
+        segment: {
+          borderColor: (ctx: ChartContext) => {
+            if (!ctx.p0?.parsed || !ctx.p1?.parsed) return '#EAB308';
+            const score = (ctx.p0.parsed.y + ctx.p1.parsed.y) / 2;
+            return getColorForScore(score);
+          }
+        },
+        borderWidth: 3,
         tension: 0.4,
+        pointBackgroundColor: (ctx: ChartPoint) => {
+          if (!ctx.parsed) return '#EAB308';
+          return getColorForScore(ctx.parsed.y);
+        },
+        pointBorderColor: 'white',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7,
       },
     ],
   };
@@ -139,7 +176,19 @@ export function IndexHistory({ data }: IndexHistoryProps) {
       },
       tooltip: {
         callbacks: {
-          label: (context: TooltipContext) => `Index: ${context.parsed.y}`,
+          label: (context: TooltipItem) => {
+            const score = context.parsed.y;
+            const status = getMarketStatus(score);
+            return [`Index: ${score}`, `Status: ${status}`];
+          },
+        },
+        titleColor: (context: TooltipContext) => {
+          const score = context.tooltip.dataPoints[0].parsed.y;
+          return getColorForScore(score);
+        },
+        bodyColor: (context: TooltipContext) => {
+          const score = context.tooltip.dataPoints[0].parsed.y;
+          return getColorForScore(score);
         },
       },
     },

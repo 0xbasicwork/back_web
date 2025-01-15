@@ -30,26 +30,26 @@ export function getMarketStatus(score: number): string {
 export function getStatusColor(status: string): string {
   switch (status) {
     case 'IT\'S SO OVER':
-      return 'text-red-500';
+      return 'text-[#EF4444]';
     case 'IT IS WHAT IT IS':
-      return 'text-orange-500';
+      return 'text-[#F97316]';
     case 'WE VIBING':
-      return 'text-yellow-500';
+      return 'text-[#EAB308]';
     case 'WE\'RE SO BACK':
-      return 'text-green-500';
+      return 'text-[#22C55E]';
     case 'LET\'S FKN GOOO!':
-      return 'text-emerald-500';
+      return 'text-[#10B981]';
     default:
       return 'text-gray-500';
   }
 }
 
 function getLEDColorForIndex(index: number): string {
-  if (index < 20) return 'bg-red-500';
-  if (index < 40) return 'bg-orange-500';
-  if (index < 60) return 'bg-yellow-500';
-  if (index < 80) return 'bg-green-500';
-  return 'bg-emerald-500';
+  if (index < 20) return 'bg-[#EF4444]';
+  if (index < 40) return 'bg-[#F97316]';
+  if (index < 60) return 'bg-[#EAB308]';
+  if (index < 80) return 'bg-[#22C55E]';
+  return 'bg-[#10B981]';
 }
 
 export default function MarketStatus() {

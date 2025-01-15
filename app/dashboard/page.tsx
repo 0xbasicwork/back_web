@@ -3,7 +3,7 @@ import Footer from '@/app/components/Footer';
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen flex flex-col bg-texture">
       <main className="flex-1 p-2 md:p-4">
         <OverBackIndex />
       </main>

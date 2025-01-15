@@ -18,6 +18,14 @@ export interface IndexData {
     onChain: number;
   };
   lastUpdated: string;
+  previousStatus?: string;
+  previousScore?: number;
+  weekAgoStatus?: string;
+  weekAgoScore?: number;
+  monthAgoStatus?: string;
+  monthAgoScore?: number;
+  yearAgoStatus?: string;
+  yearAgoScore?: number;
 }
 
 const fetchWithFallback = async (url: string, options: RequestInit = {}) => {
@@ -64,6 +72,22 @@ export async function getIndexData(): Promise<IndexData> {
     const data = await res.json();
     console.log('Response data:', data);
 
+    // Fetch historical data
+    const historyRes = await fetch(`${baseUrl}/api/proxy/history`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      cache: 'no-store'
+    });
+
+    const historyData = await historyRes.json();
+    
+    // Get the most recent previous entry if it exists
+    const previousEntry = Array.isArray(historyData) && historyData.length > 0 
+      ? historyData[0] 
+      : null;
+
     return {
       score: data.score,
       label: data.label,
@@ -73,7 +97,17 @@ export async function getIndexData(): Promise<IndexData> {
         sentiment: Math.round(data.components.sentiment),
         onChain: Math.round(data.components.onChain)
       },
-      lastUpdated: data.timestamp
+      lastUpdated: data.timestamp,
+      // Use undefined instead of null
+      previousStatus: previousEntry?.label,
+      previousScore: previousEntry?.score,
+      // These will be implemented when we have more historical data
+      weekAgoStatus: undefined,
+      weekAgoScore: undefined,
+      monthAgoStatus: undefined,
+      monthAgoScore: undefined,
+      yearAgoStatus: undefined,
+      yearAgoScore: undefined
     };
   } catch (error) {
     console.error('API Error:', error);

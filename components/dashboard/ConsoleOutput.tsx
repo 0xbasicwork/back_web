@@ -28,12 +28,11 @@ function parseLogLine(line: string): LogEntry | null {
       };
     }
 
-    // Regular log line with timestamp
+    // Regular log line with timestamp - keep original timestamp
     const match = line.match(/(\d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}:\d{2} UTC): (.+)/);
     if (match) {
       const [, timestamp, messageWithIcon] = match;
       
-      // Determine type based on icon
       let type: LogEntry['type'] = 'log';
       if (messageWithIcon.includes('✓')) type = 'success';
       else if (messageWithIcon.includes('→')) type = 'info';
@@ -41,7 +40,7 @@ function parseLogLine(line: string): LogEntry | null {
       else if (messageWithIcon.includes('❌')) type = 'error';
 
       return {
-        timestamp,
+        timestamp,  // Keep original timestamp string
         type,
         message: messageWithIcon.trim()
       };
