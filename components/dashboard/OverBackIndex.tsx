@@ -67,8 +67,8 @@ export function OverBackIndex() {
       // Show "Is it Over?"
       setHeaderText('Is it Over?');
       await new Promise(resolve => setTimeout(resolve, 4000));
-      // Show "Or Are We $BACK?"
-      setHeaderText('Or Are We $BACK?');
+      // Show "Are We $BACK?"
+      setHeaderText('Are We $BACK?');
       // Wait 30 seconds before restarting
       await new Promise(resolve => setTimeout(resolve, 30000));
       // Reset to "Hey Solana..."
