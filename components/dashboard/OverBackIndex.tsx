@@ -15,6 +15,7 @@ export function OverBackIndex() {
   const [error, setError] = useState<string | null>(null);
   const [historicalData, setHistoricalData] = useState<HistoricalDataPoint[]>([]);
   const [headerText, setHeaderText] = useState('Hey Solana...');
+  const [copyFeedback, setCopyFeedback] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -80,6 +81,16 @@ export function OverBackIndex() {
     const interval = setInterval(sequence, 37000);
     return () => clearInterval(interval);
   }, []);
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
 
   const titleContent = (
     <div className='sticky top-0 bg-white z-10 pb-2 md:pb-4 border-b border-gray-200'>
@@ -258,6 +269,21 @@ export function OverBackIndex() {
 
         <div className='text-center text-xs md:text-sm text-gray-600 mt-6 md:mt-8 font-mono'>
           Last Updated: {formattedDate(data.lastUpdated)}
+        </div>
+
+        <div className='mt-6 text-center'>
+          <div className='inline-flex items-center gap-2 bg-gray-50 rounded-lg border border-gray-200 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 cursor-pointer'
+               onClick={() => copyToClipboard('AUiXW4YH5TLNFBgVayFBRvgWTz2ApeeM1Br7FCoyrugj')}>
+            <span className='font-mono text-sm text-gray-600'>$BACK:</span>
+            <span className='font-mono text-sm'>AUiXW4YH5TLNFBgVayFBRvgWTz2ApeeM1Br7FCoyrugj</span>
+            {copyFeedback ? (
+              <span className='text-green-500 text-sm'>✓ Copied!</span>
+            ) : (
+              <svg className='w-4 h-4 text-gray-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2' />
+              </svg>
+            )}
+          </div>
         </div>
       </div>
     </div>
